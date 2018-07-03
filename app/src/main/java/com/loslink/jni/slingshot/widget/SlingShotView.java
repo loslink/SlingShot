@@ -21,6 +21,7 @@ public class SlingShotView extends View {
     private Matrix matrixSling,matrixTarget;
     private Bitmap circleSling,circleTarget;
     private float centerPiH=80;
+    private float leftCenterPiStartX,leftCenterPiStartY;
 
     public SlingShotView(Context context) {
         this(context,null);
@@ -60,7 +61,7 @@ public class SlingShotView extends View {
         stonePiPaint.setStrokeWidth(20);
 
         centerPiPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        centerPiPaint.setColor(Color.parseColor("#191818"));
+        centerPiPaint.setColor(Color.parseColor("#44191818"));
         centerPiPaint.setStyle(Paint.Style.STROKE);
         centerPiPaint.setStrokeCap(Paint.Cap.ROUND);
         centerPiPaint.setStrokeWidth(centerPiH);
@@ -79,7 +80,9 @@ public class SlingShotView extends View {
         canvasHeight=h;
 
         touchX=0;
-        touchY=(canvasHeight/2-circleSling.getHeight()+30);
+        touchY=(canvasHeight/2-circleSling.getHeight());
+        leftCenterPiStartX=-centerPiW/2;
+        leftCenterPiStartY=(canvasHeight/2-circleSling.getHeight());
     }
 
     private int centerPiW=200;
@@ -116,46 +119,63 @@ public class SlingShotView extends View {
         if(event.getAction()==MotionEvent.ACTION_DOWN){
             touchX=event.getX()-canvasWidth/2;
             touchY=event.getY()-canvasHeight/2;
-            postInvalidate();
+            getleftCenterPiStartPoint();
+
         }else if(event.getAction()==MotionEvent.ACTION_MOVE){
             touchX=event.getX()-canvasWidth/2;
             touchY=event.getY()-canvasHeight/2;
             Log.v("SlingShotView"," touchX:"+touchX+"  touchY:"+touchY);
-            postInvalidate();
+            getleftCenterPiStartPoint();
+
         }else if (event.getAction()==MotionEvent.ACTION_UP){
             touchX=0;
-            touchY=(canvasHeight/2-circleSling.getHeight()+30);
-            postInvalidate();
+            touchY=(canvasHeight/2-circleSling.getHeight());
+            leftCenterPiStartX=-centerPiW/2;
+            leftCenterPiStartY=(canvasHeight/2-circleSling.getHeight());
         }
+        postInvalidate();
         return true;
+    }
+
+    private void getleftCenterPiStartPoint(){
+        float A=(circleSling.getWidth()/2)+touchX;
+        float B=touchY-(canvasHeight/2-circleSling.getHeight());
+        float C=centerPiW/2;
+        leftCenterPiStartX=-(A*C)/(float) Math.sqrt(A*A+B*B);
+        leftCenterPiStartY=touchY-(B*C)/(float) Math.sqrt(A*A+B*B);
     }
 
     private void drawRubber(Canvas canvas){
 
-        canvas.drawLine(-(canvasWidth/2-circleSling.getWidth()/2+10),
-                (canvasHeight/2-circleSling.getHeight()+30),
-                -centerPiW/2,
-                (canvasHeight/2-circleSling.getHeight()+30),
+        //前橡胶
+        canvas.drawLine(-(canvasWidth/2-circleSling.getWidth()/2),
+                (canvasHeight/2-circleSling.getHeight()),
+                touchX,
+                touchY,
                 rubberPaint);
 
-        canvas.drawLine(centerPiW/2,
-                (canvasHeight/2-circleSling.getHeight()+30),
-                circleSling.getWidth()/2-10,
-                (canvasHeight/2-circleSling.getHeight()+30),
+        //后橡胶
+        canvas.drawLine(touchX,
+                touchY,
+                circleSling.getWidth()/2,
+                (canvasHeight/2-circleSling.getHeight()),
                 rubberPaint);
 
+        //前皮革
         canvas.drawLine(-centerPiW/2,
-                (canvasHeight/2-circleSling.getHeight()+30),
-                20,
-                (canvasHeight/2-circleSling.getHeight()+30),
+                (canvasHeight/2-circleSling.getHeight()),
+                0,
+                (canvasHeight/2-circleSling.getHeight()),
                 centerPiPaint);
 
-        canvas.drawLine(-20,
-                (canvasHeight/2-circleSling.getHeight()+30),
+        //后皮革
+        canvas.drawLine(-0,
+                (canvasHeight/2-circleSling.getHeight()),
                 centerPiW/2,
-                (canvasHeight/2-circleSling.getHeight()+30),
+                (canvasHeight/2-circleSling.getHeight()),
                 centerPiPaint);
 
+        //石头
         canvas.drawCircle(touchX,touchY,20,stonePiPaint);
     }
 
