@@ -8,16 +8,19 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.util.AttributeSet;
+import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 
 import com.loslink.jni.slingshot.R;
 
 public class SlingShotView extends View {
 
-    private Paint mPaint,baselinePaint;
+    private Paint mPaint,baselinePaint,rubberPaint,centerPiPaint,stonePiPaint;
     private float canvasWidth,canvasHeight;
     private Matrix matrixSling,matrixTarget;
     private Bitmap circleSling,circleTarget;
+    private float centerPiH=80;
 
     public SlingShotView(Context context) {
         this(context,null);
@@ -44,6 +47,24 @@ public class SlingShotView extends View {
         mPaint.setFilterBitmap(true);
         mPaint.setDither(true);
 
+        rubberPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        rubberPaint.setColor(Color.YELLOW);
+        rubberPaint.setStyle(Paint.Style.STROKE);
+        rubberPaint.setStrokeCap(Paint.Cap.ROUND);
+        rubberPaint.setStrokeWidth(20);
+
+        stonePiPaint= new Paint(Paint.ANTI_ALIAS_FLAG);
+        stonePiPaint.setColor(Color.YELLOW);
+        stonePiPaint.setStyle(Paint.Style.FILL);
+        stonePiPaint.setStrokeCap(Paint.Cap.ROUND);
+        stonePiPaint.setStrokeWidth(20);
+
+        centerPiPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        centerPiPaint.setColor(Color.parseColor("#191818"));
+        centerPiPaint.setStyle(Paint.Style.STROKE);
+        centerPiPaint.setStrokeCap(Paint.Cap.ROUND);
+        centerPiPaint.setStrokeWidth(centerPiH);
+
         matrixSling = new Matrix();
         circleSling = ((BitmapDrawable) getResources().getDrawable(R.mipmap.ic_slingshot)).getBitmap();
 
@@ -57,7 +78,11 @@ public class SlingShotView extends View {
         canvasWidth=w;
         canvasHeight=h;
 
+        touchX=0;
+        touchY=(canvasHeight/2-circleSling.getHeight()+30);
     }
+
+    private int centerPiW=200;
 
     @Override
     protected void onDraw(Canvas canvas) {//更新画布
@@ -79,6 +104,59 @@ public class SlingShotView extends View {
         matrixTarget.postTranslate(-circleTarget.getWidth()*sxTarget/2,-circleTarget.getWidth()*sxTarget/2);
         canvas.drawBitmap(circleTarget, matrixTarget,mPaint);
 
+        drawRubber(canvas);
+
+    }
+
+    private float touchX,touchY;
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+
+        if(event.getAction()==MotionEvent.ACTION_DOWN){
+            touchX=event.getX()-canvasWidth/2;
+            touchY=event.getY()-canvasHeight/2;
+            postInvalidate();
+        }else if(event.getAction()==MotionEvent.ACTION_MOVE){
+            touchX=event.getX()-canvasWidth/2;
+            touchY=event.getY()-canvasHeight/2;
+            Log.v("SlingShotView"," touchX:"+touchX+"  touchY:"+touchY);
+            postInvalidate();
+        }else if (event.getAction()==MotionEvent.ACTION_UP){
+            touchX=0;
+            touchY=(canvasHeight/2-circleSling.getHeight()+30);
+            postInvalidate();
+        }
+        return true;
+    }
+
+    private void drawRubber(Canvas canvas){
+
+        canvas.drawLine(-(canvasWidth/2-circleSling.getWidth()/2+10),
+                (canvasHeight/2-circleSling.getHeight()+30),
+                -centerPiW/2,
+                (canvasHeight/2-circleSling.getHeight()+30),
+                rubberPaint);
+
+        canvas.drawLine(centerPiW/2,
+                (canvasHeight/2-circleSling.getHeight()+30),
+                circleSling.getWidth()/2-10,
+                (canvasHeight/2-circleSling.getHeight()+30),
+                rubberPaint);
+
+        canvas.drawLine(-centerPiW/2,
+                (canvasHeight/2-circleSling.getHeight()+30),
+                20,
+                (canvasHeight/2-circleSling.getHeight()+30),
+                centerPiPaint);
+
+        canvas.drawLine(-20,
+                (canvasHeight/2-circleSling.getHeight()+30),
+                centerPiW/2,
+                (canvasHeight/2-circleSling.getHeight()+30),
+                centerPiPaint);
+
+        canvas.drawCircle(touchX,touchY,20,stonePiPaint);
     }
 
 
