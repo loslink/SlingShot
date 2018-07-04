@@ -202,7 +202,7 @@ public class SlingShotView extends View {
         paramA=(a/b)*paramB;
 
         float d=canvasHeight/2-slingShotTopY;
-        paramB =(canvasHeight*0.28f)*(b/d);
+        paramB =(canvasHeight*0.33f)*(b/d);
     }
 
     private void startShot(){
@@ -273,12 +273,10 @@ public class SlingShotView extends View {
 
     private void calcuPoints(ValueAnimator animation) {
 
-//        step = (((float) animation.getCurrentPlayTime() - lastAnimTime) / (float) animation.getDuration())
-//                * (canvasWidth / 2 + pointAreaW);
-//        lastAnimTime = (float) animation.getCurrentPlayTime();
         point.radius=stoneRadius*(float)animation.getAnimatedValue();
 
         float step = 5;
+        step = Math.abs(getSecondZeroX())/(canvasWidth/9);
         if (touchCenterX >= 0 && touchCenterY <= 0) {//第一象限
 
         } else if (touchCenterX < 0 && touchCenterY < 0) {//第二象限
