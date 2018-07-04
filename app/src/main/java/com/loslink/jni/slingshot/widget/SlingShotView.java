@@ -144,6 +144,7 @@ public class SlingShotView extends View {
     private void drawPoint(Canvas canvas){
         canvas.translate(touchX, touchY);
         canvas.scale(1,-1);
+        stonePiPaint.setAlpha(point.alpha);
         //石头
         canvas.drawCircle(point.x, point.y, point.radius, stonePiPaint);
     }
@@ -188,6 +189,7 @@ public class SlingShotView extends View {
             isShot=true;
             point.x=0;
             point.y=0;
+            point.alpha=255;
             calcuParams();
             startShot();
         }
@@ -268,6 +270,7 @@ public class SlingShotView extends View {
                 centerPiPaint);
 
         //石头
+        stonePiPaint.setAlpha(255);
         canvas.drawCircle(touchX, touchY, stoneRadius, stonePiPaint);
     }
 
@@ -295,7 +298,7 @@ public class SlingShotView extends View {
         float x = point.x;
         float y = point.y;
         if(Math.abs(point.x) > Math.abs(getSecondZeroX()*xPercent)){
-
+            point.alpha=0;
         }else {
             point.x = x + step;
             point.y = paramB * (float) Math.sin(point.x/paramA);
