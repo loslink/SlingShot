@@ -31,6 +31,7 @@ public class SlingShotView extends View {
     private float touchX, touchY;
     private float stoneRadius=20f;
     private float slingShotTopY=0;
+    private long duration=3000;
 
     public SlingShotView(Context context) {
         this(context, null);
@@ -199,13 +200,16 @@ public class SlingShotView extends View {
         float a=Math.abs(touchCenterX);
         float c=(float) Math.sqrt(a*a+b*b);
         paramA=(a/b)*paramB;
+
+        float d=canvasHeight/2-slingShotTopY;
+        paramB =(canvasHeight*0.28f)*(b/d);
     }
 
     private void startShot(){
 
-        final ValueAnimator animatorBg=ValueAnimator.ofFloat(0,canvasWidth/2);
+        final ValueAnimator animatorBg=ValueAnimator.ofFloat(1,0f);
 
-        animatorBg.setDuration(3000);
+        animatorBg.setDuration(duration);
         animatorBg.setInterpolator(new DelerAlerInterploator());
         animatorBg.setRepeatCount(0);
         animatorBg.setRepeatMode(ValueAnimator.RESTART);
@@ -272,6 +276,8 @@ public class SlingShotView extends View {
 //        step = (((float) animation.getCurrentPlayTime() - lastAnimTime) / (float) animation.getDuration())
 //                * (canvasWidth / 2 + pointAreaW);
 //        lastAnimTime = (float) animation.getCurrentPlayTime();
+        point.radius=stoneRadius*(float)animation.getAnimatedValue();
+
         float step = 5;
         if (touchCenterX >= 0 && touchCenterY <= 0) {//第一象限
 
