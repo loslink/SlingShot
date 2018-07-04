@@ -6,6 +6,9 @@ import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.graphics.Point;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.TextureView;
@@ -36,6 +39,9 @@ public class MainActivity extends Activity {
         slingShotView= (SlingShotView) findViewById(R.id.ssv_main);
         tv_score= (TextView) findViewById(R.id.tv_score);
 
+        Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        final Ringtone rt = RingtoneManager.getRingtone(getApplicationContext(), uri);
+
         tv_score.setText("Score:"+score);
         slingShotView.setOnShotListenr(new SlingShotView.OnShotListenr() {
             @Override
@@ -43,12 +49,14 @@ public class MainActivity extends Activity {
                 score=score+10;
                 tv_score.setText("Score:"+score);
                 startAnimation();
+                rt.play();
 //                Toast.makeText(MainActivity.this,"fine shot success!",Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onShotLost() {
                 Toast.makeText(MainActivity.this,"shot lost!",Toast.LENGTH_SHORT).show();
+                rt.play();
             }
         });
     }
