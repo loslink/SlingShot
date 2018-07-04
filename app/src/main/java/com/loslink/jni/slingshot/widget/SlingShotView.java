@@ -1,5 +1,8 @@
 package com.loslink.jni.slingshot.widget;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -11,25 +14,34 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.LinearInterpolator;
 
+import com.loslink.jni.slingshot.DelerAlerInterploator;
 import com.loslink.jni.slingshot.R;
 
 public class SlingShotView extends View {
 
-    private Paint mPaint,baselinePaint,rubberPaint,centerPiPaint,stonePiPaint;
-    private float canvasWidth,canvasHeight;
-    private Matrix matrixSling,matrixTarget;
-    private Bitmap circleSling,circleTarget;
-    private float centerPiH=80;
-    private float leftCenterPiStartX,leftCenterPiStartY,rightCenterPiEndX,rightCenterPiEndY;
+    private Paint mPaint, baselinePaint, rubberPaint, centerPiPaint, stonePiPaint;
+    private float canvasWidth, canvasHeight;
+    private Matrix matrixSling, matrixTarget;
+    private Bitmap circleSling, circleTarget;
+    private float centerPiH = 80;
+    private float leftCenterPiStartX, leftCenterPiStartY, rightCenterPiEndX, rightCenterPiEndY;
+    private float parabolaParam = 300;//范围0-
+    private float xPercent=0.7f;
+    private float touchCenterX,touchCenterY;
+    private BunblePoint point;
+    private float touchX, touchY;
+    private float stoneRadius=20f;
 
     public SlingShotView(Context context) {
-        this(context,null);
+        this(context, null);
     }
 
 
     public SlingShotView(Context context, AttributeSet attrs) {
-        this(context, attrs,0);
+        this(context, attrs, 0);
     }
 
     public SlingShotView(Context context, AttributeSet attrs, int defStyleAttr) {
@@ -41,7 +53,7 @@ public class SlingShotView extends View {
 
         baselinePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         baselinePaint.setColor(Color.RED);
-        baselinePaint.setStyle(Paint.Style.STROKE);
+        baselinePaint.setStyle(Paint.Style.FILL);
         baselinePaint.setStrokeWidth(2);
 
         mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -54,7 +66,7 @@ public class SlingShotView extends View {
         rubberPaint.setStrokeCap(Paint.Cap.ROUND);
         rubberPaint.setStrokeWidth(20);
 
-        stonePiPaint= new Paint(Paint.ANTI_ALIAS_FLAG);
+        stonePiPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         stonePiPaint.setColor(Color.YELLOW);
         stonePiPaint.setStyle(Paint.Style.FILL);
         stonePiPaint.setStrokeCap(Paint.Cap.ROUND);
@@ -71,95 +83,140 @@ public class SlingShotView extends View {
 
         matrixTarget = new Matrix();
         circleTarget = ((BitmapDrawable) getResources().getDrawable(R.mipmap.ic_ba)).getBitmap();
+
+        point=new BunblePoint(0,0);
+        point.radius=stoneRadius;
     }
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        canvasWidth=w;
-        canvasHeight=h;
+        canvasWidth = w;
+        canvasHeight = h;
 
-        touchX=0;
-        touchY=(canvasHeight/2-circleSling.getHeight());
-        leftCenterPiStartX=-centerPiW/2;
-        leftCenterPiStartY=(canvasHeight/2-circleSling.getHeight());
+        touchX = 0;
+        touchY = (canvasHeight / 2 - circleSling.getHeight());
+        leftCenterPiStartX = -centerPiW / 2;
+        leftCenterPiStartY = (canvasHeight / 2 - circleSling.getHeight());
 
-        rightCenterPiEndX=centerPiW/2;
-        rightCenterPiEndY=(canvasHeight/2-circleSling.getHeight());
+        rightCenterPiEndX = centerPiW / 2;
+        rightCenterPiEndY = (canvasHeight / 2 - circleSling.getHeight());
+
+        parabolaParam=canvasHeight/2;
     }
 
-    private int centerPiW=200;
+    private int centerPiW = 200;
 
     @Override
     protected void onDraw(Canvas canvas) {//更新画布
 
-        canvas.translate(canvasWidth/2,canvasHeight/2);
+        canvas.translate(canvasWidth / 2, canvasHeight / 2);
 
 //        canvas.drawLine(-canvasWidth/2,0,canvasWidth/2,0,baselinePaint);
 //        canvas.drawLine(0,-canvasHeight/2,0,canvasHeight/2,baselinePaint);
 
         matrixSling.reset();
-        float sx=((float) canvas.getWidth()/ circleSling.getWidth())*0.6f;
-        matrixSling.setScale(sx,sx);
-        matrixSling.postTranslate(-circleSling.getWidth()*sx/2,canvas.getHeight()/2- circleSling.getHeight());
-        canvas.drawBitmap(circleSling, matrixSling,mPaint);
+        float sx = ((float) canvas.getWidth() / circleSling.getWidth()) * 0.6f;
+        matrixSling.setScale(sx, sx);
+        matrixSling.postTranslate(-circleSling.getWidth() * sx / 2, canvas.getHeight() / 2 - circleSling.getHeight());
+        canvas.drawBitmap(circleSling, matrixSling, mPaint);
 
         matrixTarget.reset();
-        float sxTarget=((float) canvas.getWidth()/ circleTarget.getWidth())*0.1f;
-        matrixTarget.setScale(sxTarget,sxTarget);
-        matrixTarget.postTranslate(-circleTarget.getWidth()*sxTarget/2,-circleTarget.getWidth()*sxTarget/2);
-        canvas.drawBitmap(circleTarget, matrixTarget,mPaint);
+        float sxTarget = ((float) canvas.getWidth() / circleTarget.getWidth()) * 0.1f;
+        matrixTarget.setScale(sxTarget, sxTarget);
+        matrixTarget.postTranslate(-circleTarget.getWidth() * sxTarget / 2, -circleTarget.getWidth() * sxTarget / 2);
+        canvas.drawBitmap(circleTarget, matrixTarget, mPaint);
 
         drawRubber(canvas);
+        drawPoint(canvas);
 
+//        canvas.translate(touchCenterX, touchCenterY);
+//        canvas.scale(1,-1);
+//        for(float i=0;i<canvasWidth;i++){
+//            float y = (300) * (float) Math.sin(i / (300));
+//            canvas.drawCircle(i, y, 2, baselinePaint);
+//        }
     }
 
-    private float touchX,touchY;
+    private void drawPoint(Canvas canvas){
+        canvas.translate(touchCenterX, touchCenterY);
+        canvas.scale(1,-1);
+        //石头
+        canvas.drawCircle(point.x, point.y, point.radius, stonePiPaint);
+    }
+
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
 
-        if(event.getAction()==MotionEvent.ACTION_DOWN){
-            touchX=event.getX()-canvasWidth/2;
-            touchY=event.getY()-canvasHeight/2;
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            touchX = event.getX() - canvasWidth / 2;
+            touchY = event.getY() - canvasHeight / 2;
             getleftCenterPiStartPoint();
 
-        }else if(event.getAction()==MotionEvent.ACTION_MOVE){
-            touchX=event.getX()-canvasWidth/2;
-            touchY=event.getY()-canvasHeight/2;
-            Log.v("SlingShotView"," touchX:"+touchX+"  touchY:"+touchY);
+        } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
+            touchX = event.getX() - canvasWidth / 2;
+            touchY = event.getY() - canvasHeight / 2;
+            Log.v("SlingShotView", " touchX:" + touchX + "  touchY:" + touchY);
             getleftCenterPiStartPoint();
 
-        }else if (event.getAction()==MotionEvent.ACTION_UP){
-            touchX=0;
-            touchY=(canvasHeight/2-circleSling.getHeight());
-            leftCenterPiStartX=-centerPiW/2;
-            leftCenterPiStartY=(canvasHeight/2-circleSling.getHeight());
+        } else if (event.getAction() == MotionEvent.ACTION_UP) {
+            touchX = 0;
+            touchY = (canvasHeight / 2 - circleSling.getHeight());
+            leftCenterPiStartX = -centerPiW / 2;
+            leftCenterPiStartY = (canvasHeight / 2 - circleSling.getHeight());
 
-            rightCenterPiEndX=centerPiW/2;
-            rightCenterPiEndY=(canvasHeight/2-circleSling.getHeight());
+            rightCenterPiEndX = centerPiW / 2;
+            rightCenterPiEndY = (canvasHeight / 2 - circleSling.getHeight());
+
+            touchCenterX = event.getX() - canvasWidth / 2;
+            touchCenterY = event.getY() - canvasHeight / 2;
+
+            point.x=0;
+            point.y=0;
+            startShot();
         }
         postInvalidate();
         return true;
     }
 
-    private void getleftCenterPiStartPoint(){
-        float A=(circleSling.getWidth()/2)+touchX;
-        float B=touchY-(canvasHeight/2-circleSling.getHeight());
-        float C=centerPiW/2;
-        leftCenterPiStartX=-(A*C)/(float) Math.sqrt(A*A+B*B)+touchX;
-        leftCenterPiStartY=touchY-(B*C)/(float) Math.sqrt(A*A+B*B);
+    private void startShot(){
 
-        float A2=(circleSling.getWidth()/2)-touchX;
-        rightCenterPiEndX=(A2*C)/(float) Math.sqrt(A2*A2+B*B)+touchX;
-        rightCenterPiEndY=touchY-(B*C)/(float) Math.sqrt(A2*A2+B*B);
+        final ValueAnimator animatorBg=ValueAnimator.ofFloat(0,canvasWidth/2);
+
+        animatorBg.setDuration(5000);
+        animatorBg.setInterpolator(new DelerAlerInterploator());
+        animatorBg.setRepeatCount(0);
+        animatorBg.setRepeatMode(ValueAnimator.RESTART);
+        animatorBg.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                calcuPoints(animation);
+                postInvalidate();
+            }
+        });
+
+        animatorBg.start();
+
     }
 
-    private void drawRubber(Canvas canvas){
+    private void getleftCenterPiStartPoint() {
+        float A = (circleSling.getWidth() / 2) + touchX;
+        float B = touchY - (canvasHeight / 2 - circleSling.getHeight());
+        float C = centerPiW / 2;
+        leftCenterPiStartX = -(A * C) / (float) Math.sqrt(A * A + B * B) + touchX;
+        leftCenterPiStartY = touchY - (B * C) / (float) Math.sqrt(A * A + B * B);
+
+        float A2 = (circleSling.getWidth() / 2) - touchX;
+        rightCenterPiEndX = (A2 * C) / (float) Math.sqrt(A2 * A2 + B * B) + touchX;
+        rightCenterPiEndY = touchY - (B * C) / (float) Math.sqrt(A2 * A2 + B * B);
+    }
+
+    private void drawRubber(Canvas canvas) {
 
         //前橡胶
-        canvas.drawLine(-(canvasWidth/2-circleSling.getWidth()/2),
-                (canvasHeight/2-circleSling.getHeight()),
+        canvas.drawLine(-(canvasWidth / 2 - circleSling.getWidth() / 2),
+                (canvasHeight / 2 - circleSling.getHeight()),
                 touchX,
                 touchY,
                 rubberPaint);
@@ -167,8 +224,8 @@ public class SlingShotView extends View {
         //后橡胶
         canvas.drawLine(touchX,
                 touchY,
-                circleSling.getWidth()/2,
-                (canvasHeight/2-circleSling.getHeight()),
+                circleSling.getWidth() / 2,
+                (canvasHeight / 2 - circleSling.getHeight()),
                 rubberPaint);
 
         //前皮革
@@ -186,7 +243,36 @@ public class SlingShotView extends View {
                 centerPiPaint);
 
         //石头
-        canvas.drawCircle(touchX,touchY,20,stonePiPaint);
+        canvas.drawCircle(touchX, touchY, stoneRadius, stonePiPaint);
+    }
+
+    private void calcuPoints(ValueAnimator animation) {
+
+//        step = (((float) animation.getCurrentPlayTime() - lastAnimTime) / (float) animation.getDuration())
+//                * (canvasWidth / 2 + pointAreaW);
+//        lastAnimTime = (float) animation.getCurrentPlayTime();
+        float step = 15;
+        if (touchCenterX >= 0 && touchCenterY <= 0) {//第一象限
+
+        } else if (touchCenterX < 0 && touchCenterY < 0) {//第二象限
+
+        } else if (touchCenterX <= 0 && touchCenterY >= 0) {//第三象限
+            getNextPoint(point, step,parabolaParam, parabolaParam);
+        } else {//第四象限
+            getNextPoint(point, -step ,-parabolaParam, parabolaParam);
+        }
+
+
+    }
+
+    private BunblePoint getNextPoint(BunblePoint point, float step ,float paramA,float paramB) {
+
+        float x = point.x;
+        float y = point.y;
+        point.x = x + step;
+        point.y = paramB * (float) Math.sin(point.x/paramA);
+
+        return point;
     }
 
 
