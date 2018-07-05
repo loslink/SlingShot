@@ -277,7 +277,6 @@ public class SlingShotView extends View {
     private void calcuPoints(ValueAnimator animation) {
 
         point.radius=stoneRadius*(float)animation.getAnimatedValue();
-
         float step = 5;
         step = Math.abs(getSecondZeroX())/(canvasWidth/9);
         if (touchCenterX >= 0 && touchCenterY <= 0) {//第一象限
@@ -289,7 +288,6 @@ public class SlingShotView extends View {
         } else {//第四象限
             getNextPoint(point, -step ,-paramA, paramB);
         }
-
 
     }
 
