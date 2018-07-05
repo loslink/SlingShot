@@ -8,7 +8,8 @@ import android.view.View;
 import android.widget.TextView;
 import com.loslink.slingshot.R;
 import com.loslink.slingshot.adapter.RecyclerViewGameHistoryQuickAdapter;
-import com.loslink.slingshot.bean.HistoryData;
+import com.loslink.slingshot.bean.HistoryBean;
+import com.loslink.slingshot.utils.GameHistoryUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,13 +43,7 @@ public class GameHistoryActivity extends Activity {
 
     private void initAdapter() {
 
-        List<HistoryData> list=new ArrayList<>();
-        for (int i=0;i<10;i++){
-            HistoryData data=new HistoryData();
-            data.setScore(1000l+i);
-            data.setTime(System.currentTimeMillis());
-            list.add(data);
-        }
+        List<HistoryBean> list=GameHistoryUtil.getList();
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         if (list.size() == 0) {
             tv_news.setVisibility(View.VISIBLE);

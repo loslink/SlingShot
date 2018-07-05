@@ -1,26 +1,17 @@
 package com.loslink.slingshot.bean;
 
-import java.util.Date;
+import java.util.List;
 
 public class HistoryData {
 
-	private Long score;
-	private Long time;
-
-	public Long getScore() {
-		return score;
+	public List<HistoryBean> getList() {
+		return list;
 	}
 
-	public void setScore(Long score) {
-		this.score = score;
+	public void setList(List<HistoryBean> list) {
+		this.list = list;
 	}
 
-	public Long getTime() {
-		return time;
-	}
-
-	public void setTime(Long time) {
-		this.time = time;
-	}
+	private List<HistoryBean> list;
 
 }
