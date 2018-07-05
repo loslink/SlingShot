@@ -12,11 +12,13 @@ import android.widget.Toast;
 
 import com.loslink.slingshot.R;
 import com.loslink.slingshot.widget.SlingShotView;
+import com.umeng.analytics.MobclickAgent;
 
 import static android.animation.ValueAnimator.REVERSE;
 
 public class MainActivity extends Activity {
 
+    private final String mPageName = "MainActivity";
     private SlingShotView slingShotView;
     private TextView tv_score;
     private int score=0;
@@ -51,6 +53,17 @@ public class MainActivity extends Activity {
                 rt.play();
             }
         });
+
+        MobclickAgent.setDebugMode(true);
+        // SDK在统计Fragment时，需要关闭Activity自带的页面统计，
+        // 然后在每个页面中重新集成页面统计的代码(包括调用了 onResume 和 onPause 的Activity)。
+        MobclickAgent.openActivityDurationTrack(false);
+        // MobclickAgent.setAutoLocation(true);
+        // MobclickAgent.setSessionContinueMillis(1000);
+        // MobclickAgent.startWithConfigure(
+        // new UMAnalyticsConfig(mContext, "4f83c5d852701564c0000011", "Umeng",
+        // EScenarioType.E_UM_NORMAL));
+        MobclickAgent.setScenarioType(this, MobclickAgent.EScenarioType.E_UM_NORMAL);
     }
 
     private void startAnimation(){
@@ -66,6 +79,20 @@ public class MainActivity extends Activity {
         animatorY.setRepeatCount(0);
         animatorY.setRepeatMode(REVERSE);
         animatorY.start();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        MobclickAgent.onPageEnd(mPageName);
+        MobclickAgent.onPause(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        MobclickAgent.onPageStart(mPageName);
+        MobclickAgent.onResume(this);
     }
 
 }

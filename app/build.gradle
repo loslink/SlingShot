@@ -11,11 +11,62 @@ android {
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
+
+    signingConfigs {
+        debug {
+            storeFile file("./slingshot.jks") //loslink
+            storePassword "loslink"
+            keyAlias "slingshot"
+            keyPassword "loslink"
+        }
+        release {
+            storeFile file("./slingshot.jks") //loslink
+            storePassword "loslink"
+            keyAlias "slingshot"
+            keyPassword "loslink"
+        }
+    }
+
     buildTypes {
         release {
-            minifyEnabled false
+            buildConfigField "boolean", "LOG_DEBUG", "false"
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            zipAlignEnabled true
+            shrinkResources true // 移除无用的resource文件
+            //签名
+            pseudoLocalesEnabled true
+            signingConfig signingConfigs.release
         }
+
+        debug {
+            buildConfigField "boolean", "LOG_DEBUG", "true"
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            minifyEnabled false
+            zipAlignEnabled false
+            shrinkResources false
+            signingConfig signingConfigs.debug
+        }
+
+    }
+
+
+    sourceSets{
+        main{
+            jniLibs.srcDirs=['libs']
+        }
+    }
+
+    android {
+        lintOptions {
+            abortOnError false
+        }
+    }
+    packagingOptions {
+        exclude 'LICENSE.txt'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/maven/com.google.guava/guava/pom.properties'
+        exclude 'META-INF/maven/com.google.guava/guava/pom.xml'
     }
 }
 

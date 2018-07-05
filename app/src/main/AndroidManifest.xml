@@ -8,6 +8,10 @@
         android:roundIcon="@mipmap/icon_logo"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
+        <meta-data android:value="5b3d8082b27b0a0f5d000053" android:name="UMENG_APPKEY"/>
+        <meta-data android:value="slingshot" android:name="UMENG_CHANNEL"/>
+
         <activity
             android:name=".MainActivity"
             android:theme="@android:style/Theme.NoTitleBar"
