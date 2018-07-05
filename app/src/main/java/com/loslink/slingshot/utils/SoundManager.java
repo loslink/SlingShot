@@ -8,6 +8,8 @@ import android.util.DisplayMetrics;
 
 import com.loslink.slingshot.R;
 
+import java.util.HashMap;
+
 /**
  * 声音管理器
  * @author loslink
@@ -18,6 +20,7 @@ public class SoundManager {
     public static SoundManager dataStoreController;
     private SoundPool soundPool;
     private Context context;
+    private HashMap<Integer, Integer> hm; // 声明一个HashMap来存放声音文件
 
     public static SoundManager getInstance(Context context) {
         if (dataStoreController == null) {
@@ -32,17 +35,20 @@ public class SoundManager {
 
     private SoundManager(Context context){
         this.context=context;
-        initSoundPool();
     }
 
     // 初始化声音池的方法
-    private void initSoundPool() {
+    public void initSoundPool(int[] soundArray) {
         soundPool = new SoundPool(4, AudioManager.STREAM_MUSIC, 0); // 创建SoundPool对象
-
+        hm = new HashMap<Integer, Integer>(); // 创建HashMap对象
+        for(int i=0;i<soundArray.length;i++){
+            int sound=soundArray[i];
+            hm.put(i, soundPool.load(context, sound, 1)); // 加载声音文件musictest并且设置为1号声音放入hm中
+        }
     }
 
     // 播放声音的方法
-    public int playSound(int sound) { // 获取AudioManager引用
+    public int playSound(int index) { // 获取AudioManager引用
         AudioManager am = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
         // 获取当前音量
         float streamVolumeCurrent = am.getStreamVolume(AudioManager.STREAM_MUSIC);
@@ -51,7 +57,7 @@ public class SoundManager {
         // 计算得到播放音量
         float volume = streamVolumeCurrent / streamVolumeMax;
         // 调用SoundPool的play方法来播放声音文件
-        int currStreamId = soundPool.play(sound, volume, volume, 1, 1, 1.0f);
+        int currStreamId = soundPool.play(hm.get(index), volume, volume, 1, 0, 1.0f);
         return currStreamId;
     }
 

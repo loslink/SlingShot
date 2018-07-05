@@ -39,10 +39,12 @@ public class MainActivity extends Activity {
         tv_score= (TextView) findViewById(R.id.tv_score);
 
         tv_score.setText(getResources().getString(R.string.main_score)+score);
+
+        SoundManager.getInstance(MainActivity.this).initSoundPool(new int[]{R.raw.shot,R.raw.bomb});
         slingShotView.setOnShotListenr(new SlingShotView.OnShotListenr() {
             @Override
             public void onStartShot() {
-                currStreamId=SoundManager.getInstance(MainActivity.this).playSound(R.raw.shot);
+                currStreamId=SoundManager.getInstance(MainActivity.this).playSound(0);
             }
 
             @Override
@@ -50,7 +52,7 @@ public class MainActivity extends Activity {
                 score=score+10;
                 tv_score.setText(getResources().getString(R.string.main_score)+score);
                 startAnimation();
-                currStreamId=SoundManager.getInstance(MainActivity.this).playSound(R.raw.bomb);
+                currStreamId=SoundManager.getInstance(MainActivity.this).playSound(1);
             }
 
             @Override
