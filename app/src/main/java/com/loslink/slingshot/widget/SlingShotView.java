@@ -141,12 +141,6 @@ public class SlingShotView extends View {
 //        canvas.drawLine(-canvasWidth/2,0,canvasWidth/2,0,baselinePaint);
 //        canvas.drawLine(0,-canvasHeight/2,0,canvasHeight/2,baselinePaint);
 
-        matrixSling.reset();
-        float sx = ((float) canvas.getWidth() / circleSling.getWidth()) * 0.6f;
-        matrixSling.setScale(sx, sx);
-        matrixSling.postTranslate(-circleSling.getWidth() * sx / 2, slingShotTopY);
-        canvas.drawBitmap(circleSling, matrixSling, mPaint);
-
         baPoint.radius=0.1f;//缩放值，即屏幕宽度的0.1倍
         float sxTarget = ((float) canvas.getWidth() / circleTarget.getWidth()) * baPoint.radius;
 
@@ -154,6 +148,12 @@ public class SlingShotView extends View {
         matrixTarget.setScale(sxTarget, sxTarget);
         matrixTarget.postTranslate(baPoint.x, baPoint.y);
         canvas.drawBitmap(circleTarget, matrixTarget, mPaint);
+
+        matrixSling.reset();
+        float sx = ((float) canvas.getWidth() / circleSling.getWidth()) * 0.6f;
+        matrixSling.setScale(sx, sx);
+        matrixSling.postTranslate(-circleSling.getWidth() * sx / 2, slingShotTopY);
+        canvas.drawBitmap(circleSling, matrixSling, mPaint);
 
         drawRubber(canvas);
 
