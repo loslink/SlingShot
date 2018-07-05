@@ -33,7 +33,7 @@
         android:paddingRight="20dp"
         android:paddingTop="15dp"
         android:paddingBottom="15dp"
-        android:background="?android:attr/selectableItemBackground"
+        android:background="?android:attr/selectableItemBackgroundBorderless"
         android:text="历史"
         android:textColor="@android:color/white"
         android:textSize="18sp"/>

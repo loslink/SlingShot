@@ -20,7 +20,7 @@
         <meta-data android:value="slingshot" android:name="UMENG_CHANNEL"/>
 
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.MainActivity"
             android:theme="@android:style/Theme.NoTitleBar"
             android:screenOrientation="portrait"  >
             <intent-filter>
@@ -29,6 +29,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".ui.GameHistoryActivity" />
     </application>
 
 </manifest>

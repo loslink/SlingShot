@@ -1,14 +1,10 @@
-package com.loslink.slingshot;
+package com.loslink.slingshot.ui;
 
 import android.animation.ObjectAnimator;
 import android.app.Activity;
-import android.content.Context;
-import android.media.AudioManager;
-import android.media.Ringtone;
-import android.media.RingtoneManager;
-import android.media.SoundPool;
-import android.net.Uri;
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.view.Window;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,6 +23,7 @@ public class MainActivity extends Activity {
     private TextView tv_score;
     private int score=0;
     private int currStreamId;// 当前正播放的streamId
+    private TextView tv_history;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +34,7 @@ public class MainActivity extends Activity {
 
         slingShotView= (SlingShotView) findViewById(R.id.ssv_main);
         tv_score= (TextView) findViewById(R.id.tv_score);
+        tv_history= (TextView) findViewById(R.id.tv_history);
 
         tv_score.setText(getResources().getString(R.string.main_score)+score);
 
@@ -64,6 +62,14 @@ public class MainActivity extends Activity {
         MobclickAgent.setDebugMode(true);
         MobclickAgent.openActivityDurationTrack(false);
         MobclickAgent.setScenarioType(this, MobclickAgent.EScenarioType.E_UM_NORMAL);
+
+        tv_history.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(MainActivity.this,GameHistoryActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     private void startAnimation(){

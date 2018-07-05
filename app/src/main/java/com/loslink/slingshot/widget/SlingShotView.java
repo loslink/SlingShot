@@ -128,8 +128,8 @@ public class SlingShotView extends View {
 
         startX=-canvasWidth/2+DipToPx.dipToPx(mContext,50);
         endX=canvasWidth/2-DipToPx.dipToPx(mContext,50);
-        startY=DipToPx.dipToPx(mContext,50);
-        endY=DipToPx.dipToPx(mContext,100);
+        startY=slingShotTopY-DipToPx.dipToPx(mContext,110);
+        endY=slingShotTopY-DipToPx.dipToPx(mContext,50);
     }
 
 
