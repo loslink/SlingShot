@@ -5,6 +5,7 @@ import android.app.Activity;
 import com.loslink.slingshot.R;
 import com.loslink.slingshot.base.BaseViewHolder;
 import com.loslink.slingshot.bean.HistoryBean;
+import com.loslink.slingshot.utils.DateUtils;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -27,7 +28,7 @@ public class RecyclerViewGameHistoryQuickAdapter extends BaseQuickAdapter<Histor
         helper.setText(R.id.tv_score, "Score: "+item.getScore());
         DateFormat sdf = new SimpleDateFormat("yyyy年MM月dd日");
         String sStr = sdf.format(item.getTime());
-        helper.setText(R.id.tv_time, sStr);
+        helper.setText(R.id.tv_time, DateUtils.fromToday(item.getTime()));
     }
 
     

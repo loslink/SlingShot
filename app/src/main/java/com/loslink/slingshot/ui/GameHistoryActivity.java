@@ -12,6 +12,8 @@ import com.loslink.slingshot.bean.HistoryBean;
 import com.loslink.slingshot.utils.GameHistoryUtil;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import butterknife.Bind;
@@ -48,6 +50,7 @@ public class GameHistoryActivity extends Activity {
         if (list.size() == 0) {
             tv_news.setVisibility(View.VISIBLE);
         } else {
+            Collections.reverse(list);
             if(adapter==null){
                 adapter = new RecyclerViewGameHistoryQuickAdapter(list, GameHistoryActivity.this);
                 adapter.openLoadAnimation();
