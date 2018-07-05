@@ -243,6 +243,10 @@ public class SlingShotView extends View {
      * 射击动画
      */
     private void startShot(){
+
+        if(onShotListenr!=null){
+            onShotListenr.onStartShot();
+        }
         animatorShot=ValueAnimator.ofFloat(1,0.3f);
         animatorShot.setDuration(duration);
         animatorShot.setInterpolator(new DelerAlerInterploator());
@@ -449,6 +453,8 @@ public class SlingShotView extends View {
     }
 
     public interface OnShotListenr{
+
+        void onStartShot();
         void onShotSuccess();
         void onShotLost();
     }

@@ -2,8 +2,11 @@ package com.loslink.slingshot;
 
 import android.animation.ObjectAnimator;
 import android.app.Activity;
+import android.content.Context;
+import android.media.AudioManager;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
+import android.media.SoundPool;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.Window;
@@ -11,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.loslink.slingshot.R;
+import com.loslink.slingshot.utils.SoundManager;
 import com.loslink.slingshot.widget.SlingShotView;
 import com.umeng.analytics.MobclickAgent;
 
@@ -22,6 +26,7 @@ public class MainActivity extends Activity {
     private SlingShotView slingShotView;
     private TextView tv_score;
     private int score=0;
+    private int currStreamId;// 当前正播放的streamId
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,36 +38,29 @@ public class MainActivity extends Activity {
         slingShotView= (SlingShotView) findViewById(R.id.ssv_main);
         tv_score= (TextView) findViewById(R.id.tv_score);
 
-        Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        final Ringtone rt = RingtoneManager.getRingtone(getApplicationContext(), uri);
-
         tv_score.setText(getResources().getString(R.string.main_score)+score);
         slingShotView.setOnShotListenr(new SlingShotView.OnShotListenr() {
+            @Override
+            public void onStartShot() {
+                currStreamId=SoundManager.getInstance(MainActivity.this).playSound(R.raw.shot);
+            }
+
             @Override
             public void onShotSuccess() {
                 score=score+10;
                 tv_score.setText(getResources().getString(R.string.main_score)+score);
                 startAnimation();
-                rt.play();
-//                Toast.makeText(MainActivity.this,"fine shot success!",Toast.LENGTH_SHORT).show();
+                currStreamId=SoundManager.getInstance(MainActivity.this).playSound(R.raw.bomb);
             }
 
             @Override
             public void onShotLost() {
                 Toast.makeText(MainActivity.this,getResources().getString(R.string.main_shot_lost),Toast.LENGTH_SHORT).show();
-                rt.play();
             }
         });
 
         MobclickAgent.setDebugMode(true);
-        // SDK在统计Fragment时，需要关闭Activity自带的页面统计，
-        // 然后在每个页面中重新集成页面统计的代码(包括调用了 onResume 和 onPause 的Activity)。
         MobclickAgent.openActivityDurationTrack(false);
-        // MobclickAgent.setAutoLocation(true);
-        // MobclickAgent.setSessionContinueMillis(1000);
-        // MobclickAgent.startWithConfigure(
-        // new UMAnalyticsConfig(mContext, "4f83c5d852701564c0000011", "Umeng",
-        // EScenarioType.E_UM_NORMAL));
         MobclickAgent.setScenarioType(this, MobclickAgent.EScenarioType.E_UM_NORMAL);
     }
 
@@ -80,6 +78,7 @@ public class MainActivity extends Activity {
         animatorY.setRepeatMode(REVERSE);
         animatorY.start();
     }
+
 
     @Override
     public void onPause() {
