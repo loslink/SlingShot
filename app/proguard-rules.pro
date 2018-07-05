@@ -34,3 +34,20 @@
 -keep public class com.loslink.slingshot.R$*{
 public static final int *;
 }
+
+#butterknife
+-keep class butterknife.** { *; }
+-dontwarn butterknife.internal.**
+-keep class **$$ViewBinder { *; }
+
+-keepclasseswithmembernames class * {
+    @butterknife.* <fields>;
+}
+
+-keepclasseswithmembernames class * {
+    @butterknife.* <methods>;
+}
+
+#==================gson==========================
+-dontwarn com.google.**
+-keep class com.google.gson.** {*;}

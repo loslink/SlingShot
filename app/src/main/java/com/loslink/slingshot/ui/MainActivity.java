@@ -42,6 +42,9 @@ public class MainActivity extends Activity {
         // 移除标题栏
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main);
+//        GameHistoryUtil.addData(1000,System.currentTimeMillis()-30000);
+//        GameHistoryUtil.addData(2000,System.currentTimeMillis());
+//        GameHistoryUtil.addData(800,System.currentTimeMillis());
         if(savedInstanceState!=null)
         {
             long score=savedInstanceState.getLong("score");//取得保存的值

@@ -19,12 +19,16 @@ android {
             storePassword "loslink"
             keyAlias "slingshot"
             keyPassword "loslink"
+            v1SigningEnabled true
+            v2SigningEnabled true
         }
         release {
             storeFile file("./slingshot.jks") //loslink
             storePassword "loslink"
             keyAlias "slingshot"
             keyPassword "loslink"
+            v1SigningEnabled true
+            v2SigningEnabled true
         }
     }
 
