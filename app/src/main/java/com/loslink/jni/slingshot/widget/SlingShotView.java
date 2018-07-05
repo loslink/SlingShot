@@ -1,5 +1,7 @@
 package com.loslink.jni.slingshot.widget;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -7,18 +9,22 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.LinearInterpolator;
 
 import com.loslink.jni.slingshot.DelerAlerInterploator;
 import com.loslink.jni.slingshot.R;
+import com.loslink.jni.slingshot.utils.DipToPx;
 
 public class SlingShotView extends View {
 
-    private Paint mPaint, baselinePaint, rubberPaint, centerPiPaint, stonePiPaint;
+    private Paint mPaint, baselinePaint, rubberPaint, centerPiPaint, stonePiPaint, bombPiPaint;
     private float canvasWidth, canvasHeight;
     private Matrix matrixSling, matrixTarget;
     private Bitmap circleSling, circleTarget;
@@ -32,6 +38,16 @@ public class SlingShotView extends View {
     private float stoneRadius=20f;
     private float slingShotTopY=0;
     private long duration=3000;
+    private int centerPiW = 200;
+    BunblePoint bombPoint;
+    private float bombScale=0f;
+    private ValueAnimator animatorBomb, animatorShot;
+    private boolean isShot=false;
+    boolean isArride=false;
+    private BunblePoint baPoint;
+    private Context mContext;
+    private float startX,endX,startY,endY;
+    private OnShotListenr onShotListenr;
 
     public SlingShotView(Context context) {
         this(context, null);
@@ -44,6 +60,7 @@ public class SlingShotView extends View {
 
     public SlingShotView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        mContext=context;
         init();
     }
 
@@ -70,6 +87,12 @@ public class SlingShotView extends View {
         stonePiPaint.setStrokeCap(Paint.Cap.ROUND);
         stonePiPaint.setStrokeWidth(20);
 
+        bombPiPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        bombPiPaint.setColor(Color.YELLOW);
+        bombPiPaint.setStyle(Paint.Style.FILL);
+        bombPiPaint.setStrokeCap(Paint.Cap.ROUND);
+        bombPiPaint.setStrokeWidth(20);
+
         centerPiPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         centerPiPaint.setColor(Color.parseColor("#191818"));
         centerPiPaint.setStyle(Paint.Style.STROKE);
@@ -84,6 +107,7 @@ public class SlingShotView extends View {
 
         point=new BunblePoint(0,0);
         point.radius=stoneRadius;
+        baPoint=new BunblePoint(0,0);
     }
 
     @Override
@@ -103,9 +127,12 @@ public class SlingShotView extends View {
 
         paramB =canvasHeight/4;
 
+        startX=-canvasWidth/2+DipToPx.dipToPx(mContext,50);
+        endX=canvasWidth/2-DipToPx.dipToPx(mContext,50);
+        startY=DipToPx.dipToPx(mContext,50);
+        endY=DipToPx.dipToPx(mContext,100);
     }
 
-    private int centerPiW = 200;
 
     @Override
     protected void onDraw(Canvas canvas) {//更新画布
@@ -121,10 +148,12 @@ public class SlingShotView extends View {
         matrixSling.postTranslate(-circleSling.getWidth() * sx / 2, slingShotTopY);
         canvas.drawBitmap(circleSling, matrixSling, mPaint);
 
+        baPoint.radius=0.1f;//缩放值，即屏幕宽度的0.1倍
+        float sxTarget = ((float) canvas.getWidth() / circleTarget.getWidth()) * baPoint.radius;
+
         matrixTarget.reset();
-        float sxTarget = ((float) canvas.getWidth() / circleTarget.getWidth()) * 0.1f;
         matrixTarget.setScale(sxTarget, sxTarget);
-        matrixTarget.postTranslate(-circleTarget.getWidth() * sxTarget / 2, -circleTarget.getWidth() * sxTarget / 2);
+        matrixTarget.postTranslate(baPoint.x, baPoint.y);
         canvas.drawBitmap(circleTarget, matrixTarget, mPaint);
 
         drawRubber(canvas);
@@ -133,13 +162,13 @@ public class SlingShotView extends View {
             drawPoint(canvas);
         }
 
-//        canvas.translate(touchCenterX, touchCenterY);
-//        canvas.scale(1,-1);
-//        for(float i=0;i<canvasWidth;i++){
-//            float y = (300) * (float) Math.sin(i / (300));
-//            canvas.drawCircle(i, y, 2, baselinePaint);
-//        }
+        if(isArride){
+            bombPiPaint.setAlpha((int)(255/bombScale)-(255/5));
+            canvas.drawCircle(bombPoint.x, bombPoint.y, stoneRadius*bombScale, bombPiPaint);
+        }
+
     }
+
 
     private void drawPoint(Canvas canvas){
         canvas.translate(touchX, touchY);
@@ -157,11 +186,12 @@ public class SlingShotView extends View {
         return paramA*(float) Math.PI;
     }
 
-    private boolean isShot=false;
+
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
 
+        isArride=false;
         isShot=false;
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
             touchX = event.getX() - canvasWidth / 2;
@@ -208,14 +238,12 @@ public class SlingShotView extends View {
     }
 
     private void startShot(){
-
-        final ValueAnimator animatorBg=ValueAnimator.ofFloat(1,0f);
-
-        animatorBg.setDuration(duration);
-        animatorBg.setInterpolator(new DelerAlerInterploator());
-        animatorBg.setRepeatCount(0);
-        animatorBg.setRepeatMode(ValueAnimator.RESTART);
-        animatorBg.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+        animatorShot=ValueAnimator.ofFloat(1,0.3f);
+        animatorShot.setDuration(duration);
+        animatorShot.setInterpolator(new DelerAlerInterploator());
+        animatorShot.setRepeatCount(0);
+        animatorShot.setRepeatMode(ValueAnimator.RESTART);
+        animatorShot.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
                 calcuPoints(animation);
@@ -223,8 +251,36 @@ public class SlingShotView extends View {
             }
         });
 
-        animatorBg.start();
+        animatorShot.start();
 
+        animatorBomb=ValueAnimator.ofFloat(0.2f,5f);
+        animatorBomb.setDuration(300);
+        animatorBomb.setInterpolator(new LinearInterpolator());
+        animatorBomb.setRepeatCount(0);
+        animatorBomb.setRepeatMode(ValueAnimator.RESTART);
+        animatorBomb.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                bombScale= (float) animation.getAnimatedValue();
+                invalidate();
+            }
+        });
+        animatorBomb.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        Point targetPoint=getTargetPoint();
+                        baPoint.x=targetPoint.x;
+                        baPoint.y=targetPoint.y;
+                        postInvalidate();
+                    }
+                },200);
+
+            }
+        });
     }
 
     private void getleftCenterPiStartPoint() {
@@ -280,9 +336,7 @@ public class SlingShotView extends View {
         float step = 5;
         step = Math.abs(getSecondZeroX())/(canvasWidth/9);
         if (touchCenterX >= 0 && touchCenterY <= 0) {//第一象限
-
         } else if (touchCenterX < 0 && touchCenterY < 0) {//第二象限
-
         } else if (touchCenterX <= 0 && touchCenterY >= 0) {//第三象限
             getNextPoint(point, step, paramA, paramB);
         } else {//第四象限
@@ -291,12 +345,26 @@ public class SlingShotView extends View {
 
     }
 
+
     private BunblePoint getNextPoint(BunblePoint point, float step ,float paramA,float paramB) {
 
         float x = point.x;
         float y = point.y;
         if(Math.abs(point.x) > Math.abs(getSecondZeroX()*xPercent)){
+            animatorShot.cancel();
             point.alpha=0;
+            isArride=true;
+            bombPoint=getShotPoint();
+            animatorBomb.start();
+            if(isShotSuccess()){
+                if(onShotListenr!=null){
+                    onShotListenr.onShotSuccess();
+                }
+            }else{
+                if(onShotListenr!=null){
+                    onShotListenr.onShotLost();
+                }
+            }
         }else {
             point.x = x + step;
             point.y = paramB * (float) Math.sin(point.x/paramA);
@@ -305,5 +373,51 @@ public class SlingShotView extends View {
         return point;
     }
 
+    private BunblePoint getShotPoint(){
+        float x = getSecondZeroX()*xPercent;
+        float y = paramB * (float) Math.sin(x/paramA);
+        if(touchCenterX>=0){
+            x=-x;
+        }
+        return new BunblePoint(x,y);
+    }
+
+
+    private Point getTargetPoint(){
+        int targetX=(int)(Math.random()*(endX-startX)+startX);
+        int targetY=(int)(Math.random()*(endY-startY)+startY);
+        return new Point(targetX,targetY);
+    }
+
+    private boolean isShotSuccess(){
+
+        float toFirstZuoBiaoY=slingShotTopY-bombPoint.y;
+        float baWid=canvasWidth*baPoint.radius;
+        Log.v("isShotSuccess","baWid:" +baWid);
+        Log.v("isShotSuccess", (baPoint.x-stoneRadius/2)+"  bombPoint.x:" + bombPoint.x +"  "+(baPoint.x+baWid+stoneRadius/2));
+        Log.v("isShotSuccess", (baPoint.y-stoneRadius/2)+"  toFirstZuoBiaoY:" +toFirstZuoBiaoY+ "  "+(baPoint.y+baWid+stoneRadius/2) );
+        if(bombPoint.x>=baPoint.x-stoneRadius/2
+                && bombPoint.x<=baPoint.x+baWid+stoneRadius/2
+                && toFirstZuoBiaoY>=baPoint.y-stoneRadius/2
+                && toFirstZuoBiaoY<=baPoint.y+baWid+stoneRadius/2){
+
+            return true;
+        }
+        return false;
+    }
+
+
+    public OnShotListenr getOnShotListenr() {
+        return onShotListenr;
+    }
+
+    public void setOnShotListenr(OnShotListenr onShotListenr) {
+        this.onShotListenr = onShotListenr;
+    }
+
+    public interface OnShotListenr{
+        void onShotSuccess();
+        void onShotLost();
+    }
 
 }
