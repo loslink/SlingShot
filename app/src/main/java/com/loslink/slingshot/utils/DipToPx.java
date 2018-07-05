@@ -1,4 +1,4 @@
-package com.loslink.jni.slingshot.utils;
+package com.loslink.slingshot.utils;
 
 import android.app.Activity;
 import android.content.Context;

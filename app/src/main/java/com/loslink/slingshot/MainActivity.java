@@ -1,26 +1,18 @@
-package com.loslink.jni.slingshot;
+package com.loslink.slingshot;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
-import android.animation.ValueAnimator;
 import android.app.Activity;
-import android.graphics.Point;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.TextureView;
 import android.view.Window;
-import android.view.WindowManager;
-import android.view.animation.LinearInterpolator;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.loslink.jni.slingshot.widget.SlingShotView;
+import com.loslink.slingshot.R;
+import com.loslink.slingshot.widget.SlingShotView;
 
-import static android.animation.ValueAnimator.INFINITE;
 import static android.animation.ValueAnimator.REVERSE;
 
 public class MainActivity extends Activity {

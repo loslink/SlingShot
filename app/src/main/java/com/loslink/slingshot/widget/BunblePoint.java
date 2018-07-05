@@ -1,4 +1,4 @@
-package com.loslink.jni.slingshot.widget;
+package com.loslink.slingshot.widget;
 
 import android.graphics.Bitmap;
 import android.graphics.Matrix;

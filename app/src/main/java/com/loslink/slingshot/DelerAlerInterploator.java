@@ -1,4 +1,4 @@
-package com.loslink.jni.slingshot;
+package com.loslink.slingshot;
 
 import android.animation.TimeInterpolator;
 import android.util.Log;

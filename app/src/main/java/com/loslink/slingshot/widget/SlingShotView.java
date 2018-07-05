@@ -1,4 +1,4 @@
-package com.loslink.jni.slingshot.widget;
+package com.loslink.slingshot.widget;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -15,12 +15,11 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.animation.AccelerateInterpolator;
 import android.view.animation.LinearInterpolator;
 
-import com.loslink.jni.slingshot.DelerAlerInterploator;
-import com.loslink.jni.slingshot.R;
-import com.loslink.jni.slingshot.utils.DipToPx;
+import com.loslink.slingshot.DelerAlerInterploator;
+import com.loslink.slingshot.R;
+import com.loslink.slingshot.utils.DipToPx;
 
 public class SlingShotView extends View {
 
@@ -227,6 +226,9 @@ public class SlingShotView extends View {
         return true;
     }
 
+    /**
+     * 计算公式a、b参数
+     */
     private void calcuParams(){
         float b=touchCenterY-slingShotTopY;
         float a=Math.abs(touchCenterX);
@@ -237,6 +239,9 @@ public class SlingShotView extends View {
         paramB =(canvasHeight*0.33f)*(b/d);
     }
 
+    /**
+     * 射击动画
+     */
     private void startShot(){
         animatorShot=ValueAnimator.ofFloat(1,0.3f);
         animatorShot.setDuration(duration);
@@ -295,6 +300,10 @@ public class SlingShotView extends View {
         rightCenterPiEndY = touchY - (B * C) / (float) Math.sqrt(A2 * A2 + B * B);
     }
 
+    /**
+     * 弹弓橡胶绘图
+     * @param canvas
+     */
     private void drawRubber(Canvas canvas) {
 
         //前橡胶
@@ -330,6 +339,10 @@ public class SlingShotView extends View {
         canvas.drawCircle(touchX, touchY, stoneRadius, stonePiPaint);
     }
 
+    /**
+     * 计算连续点算法
+     * @param animation
+     */
     private void calcuPoints(ValueAnimator animation) {
 
         point.radius=stoneRadius*(float)animation.getAnimatedValue();
@@ -346,6 +359,14 @@ public class SlingShotView extends View {
     }
 
 
+    /**
+     * 运行的下一点
+     * @param point
+     * @param step
+     * @param paramA
+     * @param paramB
+     * @return
+     */
     private BunblePoint getNextPoint(BunblePoint point, float step ,float paramA,float paramB) {
 
         float x = point.x;
@@ -373,6 +394,10 @@ public class SlingShotView extends View {
         return point;
     }
 
+    /**
+     * 子弹击中点
+     * @return
+     */
     private BunblePoint getShotPoint(){
         float x = getSecondZeroX()*xPercent;
         float y = paramB * (float) Math.sin(x/paramA);
@@ -383,12 +408,20 @@ public class SlingShotView extends View {
     }
 
 
+    /**
+     * 靶的位置
+     * @return
+     */
     private Point getTargetPoint(){
         int targetX=(int)(Math.random()*(endX-startX)+startX);
         int targetY=(int)(Math.random()*(endY-startY)+startY);
         return new Point(targetX,targetY);
     }
 
+    /**
+     * 有没有击中靶
+     * @return
+     */
     private boolean isShotSuccess(){
 
         float toFirstZuoBiaoY=slingShotTopY-bombPoint.y;

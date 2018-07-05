@@ -6,9 +6,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@mipmap/ic_bg"
-    tools:context="com.loslink.jni.slingshot.MainActivity">
+    tools:context="com.loslink.jni.slingshot.com.loslink.slingshot.MainActivity">
 
-    <com.loslink.jni.slingshot.widget.SlingShotView
+    <com.loslink.slingshot.widget.SlingShotView
         android:id="@+id/ssv_main"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
