@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">SlingShot</string>
+    <string name="app_name">玩弹弓</string>
+    <string name="main_score">Score:</string>
+    <string name="main_shot_lost">shot lost!</string>
 </resources>

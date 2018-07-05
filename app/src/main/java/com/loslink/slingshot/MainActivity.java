@@ -36,12 +36,12 @@ public class MainActivity extends Activity {
         Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         final Ringtone rt = RingtoneManager.getRingtone(getApplicationContext(), uri);
 
-        tv_score.setText("Score:"+score);
+        tv_score.setText(getResources().getString(R.string.main_score)+score);
         slingShotView.setOnShotListenr(new SlingShotView.OnShotListenr() {
             @Override
             public void onShotSuccess() {
                 score=score+10;
-                tv_score.setText("Score:"+score);
+                tv_score.setText(getResources().getString(R.string.main_score)+score);
                 startAnimation();
                 rt.play();
 //                Toast.makeText(MainActivity.this,"fine shot success!",Toast.LENGTH_SHORT).show();
@@ -49,7 +49,7 @@ public class MainActivity extends Activity {
 
             @Override
             public void onShotLost() {
-                Toast.makeText(MainActivity.this,"shot lost!",Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this,getResources().getString(R.string.main_shot_lost),Toast.LENGTH_SHORT).show();
                 rt.play();
             }
         });

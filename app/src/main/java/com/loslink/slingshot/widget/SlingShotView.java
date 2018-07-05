@@ -200,7 +200,7 @@ public class SlingShotView extends View {
         } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
             touchX = event.getX() - canvasWidth / 2;
             touchY = event.getY() - canvasHeight / 2;
-            Log.v("SlingShotView", " touchX:" + touchX + "  touchY:" + touchY);
+//            Log.v("SlingShotView", " touchX:" + touchX + "  touchY:" + touchY);
             getleftCenterPiStartPoint();
 
         } else if (event.getAction() == MotionEvent.ACTION_UP) {
@@ -426,9 +426,9 @@ public class SlingShotView extends View {
 
         float toFirstZuoBiaoY=slingShotTopY-bombPoint.y;
         float baWid=canvasWidth*baPoint.radius;
-        Log.v("isShotSuccess","baWid:" +baWid);
-        Log.v("isShotSuccess", (baPoint.x-stoneRadius/2)+"  bombPoint.x:" + bombPoint.x +"  "+(baPoint.x+baWid+stoneRadius/2));
-        Log.v("isShotSuccess", (baPoint.y-stoneRadius/2)+"  toFirstZuoBiaoY:" +toFirstZuoBiaoY+ "  "+(baPoint.y+baWid+stoneRadius/2) );
+//        Log.v("isShotSuccess","baWid:" +baWid);
+//        Log.v("isShotSuccess", (baPoint.x-stoneRadius/2)+"  bombPoint.x:" + bombPoint.x +"  "+(baPoint.x+baWid+stoneRadius/2));
+//        Log.v("isShotSuccess", (baPoint.y-stoneRadius/2)+"  toFirstZuoBiaoY:" +toFirstZuoBiaoY+ "  "+(baPoint.y+baWid+stoneRadius/2) );
         if(bombPoint.x>=baPoint.x-stoneRadius/2
                 && bombPoint.x<=baPoint.x+baWid+stoneRadius/2
                 && toFirstZuoBiaoY>=baPoint.y-stoneRadius/2
