@@ -40,7 +40,9 @@ public class MainActivity extends Activity {
     private int currStreamId;// 当前正播放的streamId
     private TextView tv_history,tv_time;
     private Button bt_start;
-    private long gameTime=10*1000;
+    private long gameTime=600*1000;
+    private long oneMaxScore=200;
+    private int lianjiCount=0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,15 +78,20 @@ public class MainActivity extends Activity {
             }
 
             @Override
-            public void onShotSuccess() {
-                score=score+10;
+            public void onShotSuccess(float shotHuan) {
+                lianjiCount++;
+                score=score+(long) (oneMaxScore*shotHuan*lianjiCount);
                 tv_score.setText(getResources().getString(R.string.main_score)+score);
                 startAnimation();
                 currStreamId=SoundManager.getInstance(MainActivity.this).playSound(1);
+                if(lianjiCount>1){
+                    Toast.makeText(MainActivity.this,lianjiCount+"连击",Toast.LENGTH_SHORT).show();
+                }
             }
 
             @Override
             public void onShotLost() {
+                lianjiCount=0;
                 Toast.makeText(MainActivity.this,getResources().getString(R.string.main_shot_lost),Toast.LENGTH_SHORT).show();
             }
         });
@@ -120,14 +127,15 @@ public class MainActivity extends Activity {
 
             @Override
             public void onTick(long millisUntilFinished) {
-                tv_time.setText(((millisUntilFinished)/1000)+"S");
+                tv_time.setText(((millisUntilFinished)/1000)+"s");
             }
 
             @Override
             public void onFinish() {
-                tv_time.setText("0S");
+                tv_time.setText("0s");
                 bt_start.setVisibility(View.VISIBLE);
                 GameHistoryUtil.addData(score,System.currentTimeMillis());
+                slingShotView.stopGame(true);
             }
         }.start();
     }

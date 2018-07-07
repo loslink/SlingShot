@@ -116,7 +116,8 @@ public class SlingShotView extends View {
         canvasWidth = w;
         canvasHeight = h;
 
-        slingShotTopY=(canvasHeight / 2 - circleSling.getHeight());
+        float slingH=(float)((float)circleSling.getHeight()/((float)circleSling.getWidth()/(canvasWidth*0.6)));
+        slingShotTopY=(canvasHeight / 2 - slingH);
         touchX = 0;
         touchY = slingShotTopY;
         leftCenterPiStartX = -centerPiW / 2;
@@ -149,6 +150,12 @@ public class SlingShotView extends View {
         matrixTarget.setScale(sxTarget, sxTarget);
         matrixTarget.postTranslate(baPoint.x, baPoint.y);
         canvas.drawBitmap(circleTarget, matrixTarget, mPaint);
+
+//        canvas.drawLine(-canvasWidth/2,slingShotTopY,canvasWidth/2,slingShotTopY,baselinePaint);
+//        if(bombPoint!=null){
+//            canvas.drawLine(-canvasWidth/2,slingShotTopY-bombPoint.y,canvasWidth/2,slingShotTopY-bombPoint.y,baselinePaint);
+//        }
+//        canvas.drawLine(-canvasWidth/2,baPoint.y,canvasWidth/2,baPoint.y,baselinePaint);
 
         matrixSling.reset();
         float sx = ((float) canvas.getWidth() / circleSling.getWidth()) * 0.6f;
@@ -254,6 +261,12 @@ public class SlingShotView extends View {
 
         if(onShotListenr!=null){
             onShotListenr.onStartShot();
+        }
+        if(animatorShot!=null && animatorShot.isRunning()){
+            animatorShot.cancel();
+        }
+        if(animatorBomb!=null && animatorBomb.isRunning()){
+            animatorBomb.cancel();
         }
         animatorShot=ValueAnimator.ofFloat(1,0.3f);
         animatorShot.setDuration(duration);
@@ -391,7 +404,7 @@ public class SlingShotView extends View {
             animatorBomb.start();
             if(isShotSuccess()){
                 if(onShotListenr!=null){
-                    onShotListenr.onShotSuccess();
+                    onShotListenr.onShotSuccess(shotHuan);
                 }
             }else{
                 if(onShotListenr!=null){
@@ -430,6 +443,7 @@ public class SlingShotView extends View {
         return new Point(targetX,targetY);
     }
 
+    float shotHuan=0;//命中环数
     /**
      * 有没有击中靶
      * @return
@@ -439,13 +453,17 @@ public class SlingShotView extends View {
         float toFirstZuoBiaoY=slingShotTopY-bombPoint.y;
         float baWid=canvasWidth*baPoint.radius;
 //        Log.v("isShotSuccess","baWid:" +baWid);
-//        Log.v("isShotSuccess", (baPoint.x-stoneRadius/2)+"  bombPoint.x:" + bombPoint.x +"  "+(baPoint.x+baWid+stoneRadius/2));
-//        Log.v("isShotSuccess", (baPoint.y-stoneRadius/2)+"  toFirstZuoBiaoY:" +toFirstZuoBiaoY+ "  "+(baPoint.y+baWid+stoneRadius/2) );
-        if(bombPoint.x>=baPoint.x-stoneRadius/2
-                && bombPoint.x<=baPoint.x+baWid+stoneRadius/2
-                && toFirstZuoBiaoY>=baPoint.y-stoneRadius/2
-                && toFirstZuoBiaoY<=baPoint.y+baWid+stoneRadius/2){
+        Log.v("SlingShotView", "  bombPoint.x:" + bombPoint.x +"  bombPoint.y:" + bombPoint.y +"  toFirstZuoBiaoY:"+toFirstZuoBiaoY);
+        Log.v("SlingShotView", "  baPoint.x:" + baPoint.x +"  baPoint.y:"+baPoint.y);
 
+        double distance=Math.sqrt((bombPoint.x-(baPoint.x+baWid/2))*(bombPoint.x-(baPoint.x+baWid/2))+(toFirstZuoBiaoY-(baPoint.y+baWid/2))*(toFirstZuoBiaoY-(baPoint.y+baWid/2)));
+//        if(bombPoint.x>=baPoint.x-stoneRadius*0.3/2
+//                && bombPoint.x<=baPoint.x+baWid+stoneRadius*0.3/2
+//                && toFirstZuoBiaoY>=baPoint.y-stoneRadius*0.3/2
+//                && toFirstZuoBiaoY<=baPoint.y+baWid+stoneRadius*0.3/2){
+        Log.v("SlingShotView", " distance:" + distance + "  banjing:" + (baWid/2+stoneRadius*0.3/2));
+        if(distance<=(baWid/2+stoneRadius*0.3/2)){
+            shotHuan=1f-(float)(distance/(baWid/2+stoneRadius*0.3/2));
             return true;
         }
         return false;
@@ -463,7 +481,7 @@ public class SlingShotView extends View {
     public interface OnShotListenr{
 
         void onStartShot();
-        void onShotSuccess();
+        void onShotSuccess(float shot);
         void onShotLost();
     }
 
