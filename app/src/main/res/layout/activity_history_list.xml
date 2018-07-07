@@ -17,9 +17,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:text="没有数据..."
-        android:textColor="#a1a1a1"
-        android:textSize="16sp"
+        android:text="还没有游戏记录哟..."
+        android:textColor="#ffffff"
+        android:textSize="18sp"
         android:visibility="gone" />
 
 

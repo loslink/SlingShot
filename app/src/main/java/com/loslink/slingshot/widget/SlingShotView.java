@@ -47,6 +47,7 @@ public class SlingShotView extends View {
     private Context mContext;
     private float startX,endX,startY,endY;
     private OnShotListenr onShotListenr;
+    private boolean isStop=false;;
 
     public SlingShotView(Context context) {
         this(context, null);
@@ -190,6 +191,9 @@ public class SlingShotView extends View {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
 
+        if(isStop){
+            return true;
+        }
         isArride=false;
         isShot=false;
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
@@ -224,6 +228,10 @@ public class SlingShotView extends View {
         }
         postInvalidate();
         return true;
+    }
+
+    public void stopGame(boolean stop){
+        isStop=stop;
     }
 
     /**
