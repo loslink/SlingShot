@@ -49,6 +49,17 @@
         android:textSize="22sp"/>
 
     <TextView
+        android:id="@+id/tv_lianji"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="30dp"
+        android:layout_below="@+id/tv_score"
+        android:text="2连击"
+        android:textColor="@android:color/holo_orange_dark"
+        android:textSize="24sp"/>
+
+    <TextView
         android:id="@+id/tv_history"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

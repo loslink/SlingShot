@@ -38,7 +38,7 @@ public class MainActivity extends Activity {
     private TextView tv_score;
     private long score=0;
     private int currStreamId;// 当前正播放的streamId
-    private TextView tv_history,tv_time;
+    private TextView tv_history,tv_time,tv_lianji;
     private Button bt_start;
     private long gameTime=600*1000;
     private long oneMaxScore=200;
@@ -63,8 +63,10 @@ public class MainActivity extends Activity {
         tv_score= (TextView) findViewById(R.id.tv_score);
         tv_history= (TextView) findViewById(R.id.tv_history);
         tv_time= (TextView) findViewById(R.id.tv_time);
+        tv_lianji= (TextView) findViewById(R.id.tv_lianji);
         bt_start= (Button) findViewById(R.id.bt_start);
 
+        tv_lianji.setVisibility(View.GONE);
         bt_start.setVisibility(View.VISIBLE);
         tv_time.setText((gameTime/1000)+"s");
         tv_score.setText(getResources().getString(R.string.main_score)+score);
@@ -85,7 +87,9 @@ public class MainActivity extends Activity {
                 startAnimation();
                 currStreamId=SoundManager.getInstance(MainActivity.this).playSound(1);
                 if(lianjiCount>1){
-                    Toast.makeText(MainActivity.this,lianjiCount+"连击",Toast.LENGTH_SHORT).show();
+                    tv_lianji.setVisibility(View.VISIBLE);
+                    tv_lianji.setText(lianjiCount+"连击");
+                    startLianjiAnimation();
                 }
             }
 
@@ -153,6 +157,38 @@ public class MainActivity extends Activity {
         animatorY.setRepeatCount(0);
         animatorY.setRepeatMode(REVERSE);
         animatorY.start();
+    }
+
+    private void startLianjiAnimation(){
+
+        ObjectAnimator animatorX = ObjectAnimator.ofFloat(tv_lianji, "scaleX", 1f, 4f);
+        animatorX.setDuration(400);
+        animatorX.setRepeatCount(0);
+        animatorX.setRepeatMode(REVERSE);
+        animatorX.start();
+
+        ObjectAnimator animatorY = ObjectAnimator.ofFloat(tv_lianji, "scaleY", 1f, 4f);
+        animatorY.setDuration(400);
+        animatorY.setRepeatCount(0);
+        animatorY.setRepeatMode(REVERSE);
+        animatorY.start();
+
+        ObjectAnimator animatorAlpha = ObjectAnimator.ofFloat(tv_lianji, "alpha", 1f, 0f);
+        animatorAlpha.setDuration(400);
+        animatorAlpha.setRepeatCount(0);
+        animatorAlpha.setRepeatMode(REVERSE);
+        animatorAlpha.start();
+
+        animatorAlpha.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                tv_lianji.setVisibility(View.GONE);
+                tv_lianji.setAlpha(1f);
+                tv_lianji.setScaleX(1f);
+                tv_lianji.setScaleY(1f);
+            }
+        });
     }
 
     private void startButtonAnimation(){
